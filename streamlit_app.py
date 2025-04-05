@@ -37,15 +37,14 @@ else:
         with st.chat_message("user"):
             st.markdown(prompt)
 
-        # OpenAI API를 사용하여 응답 생성
-        stream = client.chat.completions.create(
-            model="gpt-4o-mimi",
-            messages=[
-                {"role": m["role"], "content": m["content"]}
-                for m in st.session_state.messages
-            ],
-            stream=True,
+        from openai import OpenAI
+        
+        client = OpenAI(api_key="your-api-key-here")
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": "Hello!"}]
         )
+        print(response.choices[0].message.content)
 
         # 응답을 채팅에 스트리밍하고 세션 상태에 저장
         with st.chat_message("assistant"):
