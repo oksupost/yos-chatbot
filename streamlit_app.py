@@ -2,17 +2,19 @@ import streamlit as st
 from openai import OpenAI
 
 # Show title and description.
-st.title("💬 과천 맛집 여행 챗봇")
+st.title("💬 아름다운 도시 과천 맛집 여행")
 
 # 모델에 대한 내용을 작성한다-yos
-# 챗봇의 설명을 추가한다.
-
 st.write(
-    "🐨🦘 아름다운 도시 과천의 맛집을 소개하는 챗봇입니다! 🦘🐨"
-    "이 앱을 사용하기 위해서는 OpenAI API 키가 필요하며, "
-    "여기에서 획득할 수 있습니다: [API 키 받기](https://platform.openai.com/account/api-keys)."
-    "이 앱을 단계별로 만드는 방법은 [우리의 튜토리얼을 따라해보세요](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps)."
-)
+
+     "🐨🦘 아름다운 도시 과천 맛집 여행 🦘🐨"
+     "To use this app, you need to provide an OpenAI API key, which you can get [here](https://platform.openai.com/account/api-keys). "
+     "You can also learn how to build this app step by step by [following our tutorial](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps)."
+
+# Ask user for their OpenAI API key via `st.text_input`.
+# Alternatively, you can store the API key in `./.streamlit/secrets.toml` and access it
+# via `st.secrets`, see https://docs.streamlit.io/develop/concepts/connections/secrets-management
+openai_api_key = st.text_input("OpenAI API Key", type="password")
 
 # api_key 주의한다-yos
 
