@@ -2,13 +2,13 @@ import streamlit as st
 from openai import OpenAI
 
 # 타이틀 설정
-st.title("💬 과천 맛집 여행 챗봇")
+st.title("🍳 브런치 카페 메뉴 추천 챗봇")
 
 # 챗봇 설명 추가
 st.write(
-    "🐨🦘 아름다운 도시 과천의 맛집을 소개하는 챗봇입니다! 🦘🐨 "
-    "이 앱을 사용하려면 OpenAI API 키가 필요합니다. 키는 [여기](https://platform.openai.com/account/api-keys)에서 받을 수 있습니다. "
-    "앱 제작 과정을 단계별로 배우고 싶다면 [튜토리얼](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps)을 참고하세요."
+    "🥐☕ 브런치 카페에서 당신의 취향에 맞는 메뉴를 추천해 드립니다! "
+    "선호하는 맛과 식이 제한을 알려주시면 최적의 메뉴를 찾아드려요. "
+    "이 앱을 사용하려면 OpenAI API 키가 필요합니다. 키는 [여기](https://platform.openai.com/account/api-keys)에서 받을 수 있습니다."
 )
 
 # OpenAI API 키 입력 필드
@@ -25,26 +25,50 @@ else:
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
+    # 맛 선호도 및 식이 제한 입력 UI 추가
+    flavor = st.selectbox("선호하는 맛을 선택하세요:", ["달콤한", "쌉쌀한", "고소한", "상큼한", "기본"])
+    dietary = st.multiselect("식이 제한이 있나요?", ["비건", "글루텐 프리", "유당 프리", "없음"])
+
     # 기존 대화 메시지 표시
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
     # 사용자 입력 받기
-    if prompt := st.chat_input("과천 맛집에 대해 궁금한 점을 물어보세요!"):
-        # 사용자 메시지 저장 및 표시
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
+    if prompt := st.chat_input("추가로 원하는 점이 있으면 말씀해주세요 (예: '가벼운 메뉴 추천해줘')"):
+        # 사용자 입력과 선택된 옵션 결합
+        full_prompt = f"나는 {flavor} 맛을 좋아하고, 식이 제한은 {dietary}이야. {prompt}"
 
-        # OpenAI API로 응답 생성
+        # 사용자 메시지 저장 및 표시
+        st.session_state.messages.append({"role": "user", "content": full_prompt})
+        with st.chat_message("user"):
+            st.markdown(full_prompt)
+
+        # OpenAI API로 응답 생성 (메뉴 추천 로직 포함)
         try:
+            # 시스템 메시지로 메뉴 추천 가이드라인 제공
+            system_message = {
+                "role": "system",
+                "content": (
+                    "당신은 브런치 카페 메뉴 추천 챗봇입니다. 다음 메뉴 중에서 사용자의 선호도와 식이 제한에 맞는 메뉴를 추천하세요:\n"
+                    "- 팬케이크 (달콤한, 유당 포함)\n"
+                    "- 아보카도 토스트 (고소한, 비건 가능)\n"
+                    "- 스크램블 에그 (기본, 글루텐 프리)\n"
+                    "- 레몬 타르트 (상큼한, 글루텐 포함)\n"
+                    "- 에스프레소 (쌉쌀한, 비건, 글루텐 프리)\n"
+                    "추가 요청이 있다면 반영해서 추천해 주세요."
+                )
+            }
+
+            # 대화 메시지에 시스템 메시지 추가
+            messages = [system_message] + [
+                {"role": m["role"], "content": m["content"]}
+                for m in st.session_state.messages
+            ]
+
             stream = client.chat.completions.create(
-                model="gpt-4o-mini",  # 올바른 모델 이름 사용
-                messages=[
-                    {"role": m["role"], "content": m["content"]}
-                    for m in st.session_state.messages
-                ],
+                model="gpt-4o-mini",
+                messages=messages,
                 stream=True,
             )
 
