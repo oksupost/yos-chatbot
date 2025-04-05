@@ -1,16 +1,15 @@
 import streamlit as st
 from openai import OpenAI
 
+# 타이틀 설정
+st.title("🍳 브런치 카페 메뉴 추천 챗봇")
+
 # 이미지 추가 (URL 사용)
 st.image(
-    
-    "https://github.com/oksupost/yos-chatbot/blob/main/cafe.jpg?raw=true",
+    "https://images.unsplash.com/photo-1519985176271-adb1088fa94c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80",
     caption="맛있는 브런치 카페 메뉴를 추천받아보세요!",
     use_column_width=True
 )
-
-# 타이틀 설정
-st.title("🍳 브런치 카페 메뉴 추천 챗봇")
 
 # 챗봇 설명 추가
 st.write(
